@@ -151,4 +151,5 @@ int main()
     }
     BFS(&G2, &Q, 1, 6);
     return 0;
+
 }
