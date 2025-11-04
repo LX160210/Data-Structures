@@ -26,5 +26,7 @@ G->V[i].v[2]='\0'；
 }
 
 void InitAdjvex(AMGraph *G,int n){
-  
+  G->A[1].next=G->A[];
+  G->A[1].data=;
+  //continue
 }
