@@ -36,7 +36,7 @@ void EnQueue(Queue *q, Tree *T)
         printf("队列满\n");
         return;
     }
-    if (T == NULL)
+    if (!T)
     {
         return;
     }
@@ -78,7 +78,7 @@ void CreateTree(Tree **T)
 // 前序遍历
 void PreOrder(Tree *T)
 {
-    if (T != NULL)
+    if (T)
     {
         printf("%c ", T->data);
         PreOrder(T->left);
@@ -89,7 +89,7 @@ void PreOrder(Tree *T)
 // 中序遍历
 void InOrder(Tree *T)
 {
-    if (T != NULL)
+    if (T)
     {
         InOrder(T->left);
         printf("%c ", T->data);
@@ -100,7 +100,7 @@ void InOrder(Tree *T)
 // 后序遍历
 void PostOrder(Tree *T)
 {
-    if (T != NULL)
+    if (T)
     {
         PostOrder(T->left);
         PostOrder(T->right);
@@ -111,6 +111,11 @@ void PostOrder(Tree *T)
 // 层序遍历
 void LevelOrder(Tree *T)
 {
+    if (!T)
+    {
+        printf("该树为空");
+        return;
+    }
     Queue *q = (Queue *)malloc(sizeof(Queue));
     InitQueue(q);
     EnQueue(q, T);
@@ -126,6 +131,17 @@ void LevelOrder(Tree *T)
     printf("\n");
 }
 
+// 清空二叉树
+void Clear(Tree **T)
+{
+    if (*T)
+    {
+        Clear(&(*T)->left);
+        Clear(&(*T)->right);
+        *T = NULL;
+        free(*T);
+    }
+}
 int main()
 {
     Tree *T;
@@ -136,6 +152,8 @@ int main()
     printf("\n");
     PostOrder(T);
     printf("\n");
+    LevelOrder(T);
+    Clear(&T);
     LevelOrder(T);
     return 0;
 }
