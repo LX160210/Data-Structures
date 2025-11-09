@@ -1,3 +1,4 @@
+//待完善（复杂情况下所得到路径不正确）
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -157,4 +158,5 @@ int main()
     Initweight(G);
     Dijkstra(G, 1);
     return 0;
+
 }
