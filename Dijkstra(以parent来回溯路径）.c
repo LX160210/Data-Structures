@@ -120,18 +120,15 @@ void print(AMGraph *G, int v)
 void Dijkstra(AMGraph *G, int v)
 {
     Resetvisited();
-    visited[v] = 1;
     for (int i = 1; i < N; i++)
     {
-        if (i == v)
-            parent[i] = -1;
-        else
-            parent[i] = v;
+        parent[i] = -1;
     }
     for (int i = 1; i < N; i++)
     {
-        path[i] = G->weight[v][i];
+        path[i] = INF;
     }
+    path[v]=0;
     while (check())
     {
         int min = INF;
