@@ -128,7 +128,7 @@ void Dijkstra(AMGraph *G, int v)
     {
         path[i] = INF;
     }
-    path[v]=0;
+    path[v] = 0;
     while (check())
     {
         int min = INF;
