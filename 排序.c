@@ -116,7 +116,7 @@ void ShellInsertSort(int *data, int length)
 
 void BubbleSort(int *data, int length)
 {
-    for (int i = 1; i < length + 1; i++)
+    for (int i = 0; i < length; i++)
     {
         int k = 0;
         for (int j = 2, temp; j < length + 1 - i; j++)
@@ -192,4 +192,5 @@ int main()
     BubbleSort(data1, length1);
     QuickSort(data1, 1, length1, length1);
     return 0;
+
 }
