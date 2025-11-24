@@ -184,6 +184,33 @@ void QuickSort(int *data, int left, int right, int length)
     printf("\n");
     resetdata(data, data01, length1);
 }
+
+void SimpleSelectionSort(int *data, int length)
+{
+    for (int j = 1; j < length + 1; j++)
+    {
+        int MIN = 999;
+        int k = 0;
+        for (int i = j; i < length + 1; i++)
+        {
+            if (data[i] < MIN)
+            {
+                MIN = data[i];
+                k = i;
+            }
+        }
+        data[0] = data[k];
+        data[k] = data[j];
+        data[j] = data[0];
+    }
+    for (int i = 1; i < length + 1; i++)
+    {
+        printf("%d ", data[i]);
+    }
+    printf("\n");
+    resetdata(data, data01, length1);
+}
+
 int main()
 {
     InsertSort(data1, length1);
@@ -191,6 +218,8 @@ int main()
     ShellInsertSort(data2, length2);
     BubbleSort(data1, length1);
     QuickSort(data1, 1, length1, length1);
+    SimpleSelectionSort(data1, length1);
     return 0;
 
 }
+
