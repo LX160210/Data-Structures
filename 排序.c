@@ -7,6 +7,7 @@ int data1[] = {0, 49, 38, 65, 97, 76, 13, 27, 49};
 int data2[] = {0, 49, 38, 65, 97, 76, 13, 27, 49, 55, 4};
 int length1 = sizeof(data1) / sizeof(data1[0]) - 1;
 int length2 = sizeof(data2) / sizeof(data2[0]) - 1;
+int visited[sizeof(data2) / sizeof(data2[0])] = {0};
 
 void resetdata(int *data, int *source, int length)
 {
@@ -211,6 +212,54 @@ void SimpleSelectionSort(int *data, int length)
     resetdata(data, data01, length1);
 }
 
+void HeapAdjust(int *data, int length)
+{
+    for (int j = length / 2; j > 0; j--)
+    {
+        int k = 0;
+        for (int i = length / 2; i > 0; i--)
+        {
+            if (data[2 * i] > data[i] && visited[2 * i] == 0)
+            {
+                data[0] = data[2 * i];
+                data[2 * i] = data[i];
+                data[i] = data[0];
+                k = 1;
+            }
+            if (data[2 * i + 1] && data[2 * i + 1] > data[i] && visited[2 * i + 1] == 0)
+            {
+                data[0] = data[2 * i + 1];
+                data[2 * i + 1] = data[i];
+                data[i] = data[0];
+                k = 1;
+            }
+        }
+        if (k == 0)
+        {
+            break;
+        }
+    }
+}
+
+void HeapSort(int *data, int length)
+{
+    HeapAdjust(data, length);
+    for (int i = length; i > 1; i--)
+    {
+        data[0] = data[i];
+        data[i] = data[1];
+        data[1] = data[0];
+        visited[i] = 1;
+        HeapAdjust(data, i - 1);
+    }
+    for (int i = 1; i < length + 1; i++)
+    {
+        printf("%d ", data[i]);
+    }
+    printf("\n");
+    resetdata(data, data02, length2);
+}
+
 int main()
 {
     InsertSort(data1, length1);
@@ -219,7 +268,6 @@ int main()
     BubbleSort(data1, length1);
     QuickSort(data1, 1, length1, length1);
     SimpleSelectionSort(data1, length1);
+    HeapSort(data2, length2);
     return 0;
-
 }
-
