@@ -260,6 +260,84 @@ void HeapSort(int *data, int length)
     resetdata(data, data02, length2);
 }
 
+typedef struct data_i
+{
+    int t[20];
+} data_i;
+
+typedef struct Data
+{
+    data_i temp[20];
+} Data;
+
+void InitData(Data *D)
+{
+    for (int i = 0; i < 20; i++)
+    {
+        for (int j = 0; j < 20; j++)
+        {
+            D->temp[i].t[j] = 0;
+        }
+    }
+}
+
+void MergingSort(int *data, int length, Data *D)
+{
+    // int *Temp = (int *)malloc((length + 1) * sizeof(int));
+    int left = 1;
+    int right = 2;
+    int L = 1;
+    int pos = left;
+    for (int i = 1; i < length + 1; i++)
+    {
+        D->temp[1].t[i] = data[i];
+    }
+    int k = 1;
+    for (int i = length / 2; i > 1; i--)
+    {
+        // int *Temp_i = (int *)malloc((length + 1) * sizeof(int));
+        int begin1 = left;
+        int begin2 = right;
+        while (left < right && right <= length)
+        {
+            if (D->temp[k].t[left] < D->temp[k].t[right] && left < right && right <= length)
+            {
+                D->temp[k + 1].t[pos] = D->temp[k].t[left];
+                left++;
+                pos++;
+            }
+            else if (D->temp[k].t[right] < D->temp[k].t[left] && left < right && right <= length)
+            {
+                D->temp[k + 1].t[pos] = D->temp[k].t[right];
+                right++;
+                pos++;
+            }
+            while (left == begin1 + L && right < begin2 + L && left < right && right <= length)
+            {
+                D->temp[k + 1].t[pos] = D->temp[k].t[right];
+                right++;
+                pos++;
+            }
+            while (right == begin2 + L && left < begin1 + L && left < right && right <= length)
+            {
+                D->temp[k + 1].t[pos] = D->temp[k].t[left];
+                left++;
+                pos++;
+            }
+            left = L * 2 + begin1;
+            right = L * 2 + begin2;
+        }
+        L = L * 2;
+        left = 1;
+        right = L + 1;
+        k++;
+    }
+    for (int i = 1; i < length + 1; i++)
+    {
+        printf("%d ", D->temp[k].t[i]);
+    }
+    printf("\n");
+}
 int main()
 {
     InsertSort(data1, length1);
@@ -269,5 +347,8 @@ int main()
     QuickSort(data1, 1, length1, length1);
     SimpleSelectionSort(data1, length1);
     HeapSort(data2, length2);
+    Data *D = (Data *)malloc(sizeof(Data));
+    InitData(D);
+    MergingSort(data1, length1, D);
     return 0;
 }
