@@ -36,6 +36,7 @@ void InsertSort(int *data, int length)
         }
         current++;
     }
+    printf("InsertSort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -79,6 +80,7 @@ void BInertSort(int *data, int length)
         }
         current++;
     }
+    printf("Binary InsertSort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -107,6 +109,7 @@ void ShellInsertSort(int *data, int length)
             }
         }
     }
+    printf("Shell InsertSort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -135,6 +138,7 @@ void BubbleSort(int *data, int length)
             break;
         }
     }
+    printf("Bubble Sort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -178,6 +182,7 @@ void quicksort(int *data, int left, int right)
 void QuickSort(int *data, int left, int right, int length)
 {
     quicksort(data, left, right);
+    printf("Quick Sort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -204,6 +209,7 @@ void SimpleSelectionSort(int *data, int length)
         data[k] = data[j];
         data[j] = data[0];
     }
+    printf("Simple Selection Sort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -252,6 +258,7 @@ void HeapSort(int *data, int length)
         visited[i] = 1;
         HeapAdjust(data, i - 1);
     }
+    printf("Heap Sort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
         printf("%d ", data[i]);
@@ -281,63 +288,66 @@ void InitData(Data *D)
     }
 }
 
-void MergingSort(int *data, int length, Data *D)
+int check(int *data, int length)
 {
-    // int *Temp = (int *)malloc((length + 1) * sizeof(int));
-    int left = 1;
-    int right = 2;
-    int L = 1;
-    int pos = left;
-    for (int i = 1; i < length + 1; i++)
+    for (int i = 1; i < length; i++)
     {
-        D->temp[1].t[i] = data[i];
-    }
-    int k = 1;
-    for (int i = length / 2; i > 1; i--)
-    {
-        // int *Temp_i = (int *)malloc((length + 1) * sizeof(int));
-        int begin1 = left;
-        int begin2 = right;
-        while (left < right && right <= length)
+        if (data[i] > data[i + 1])
         {
-            if (D->temp[k].t[left] < D->temp[k].t[right] && left < right && right <= length)
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void MergingSort(int *data, int length)
+{
+    int L = 1;
+    int T[length + 1];
+    while (!check(data, length))
+    {
+        int left = 1;
+        int right = L + left;
+        int k = 1;
+        while (left <= length && right <= length)
+        {
+            int i = left;
+            int j = right;
+            while (i <= left - 1 + L && j <= right - 1 + L && i <= length && j <= length)
             {
-                D->temp[k + 1].t[pos] = D->temp[k].t[left];
-                left++;
-                pos++;
+                if (data[i] < data[j])
+                {
+                    T[k++] = data[i++];
+                }
+                else
+                    T[k++] = data[j++];
             }
-            else if (D->temp[k].t[right] < D->temp[k].t[left] && left < right && right <= length)
+            while (i <= left - 1 + L && i <= length)
             {
-                D->temp[k + 1].t[pos] = D->temp[k].t[right];
-                right++;
-                pos++;
+                T[k++] = data[i++];
             }
-            while (left == begin1 + L && right < begin2 + L && left < right && right <= length)
+            while (j <= right - 1 + L && j <= length)
             {
-                D->temp[k + 1].t[pos] = D->temp[k].t[right];
-                right++;
-                pos++;
+                T[k++] = data[j++];
             }
-            while (right == begin2 + L && left < begin1 + L && left < right && right <= length)
-            {
-                D->temp[k + 1].t[pos] = D->temp[k].t[left];
-                left++;
-                pos++;
-            }
-            left = L * 2 + begin1;
-            right = L * 2 + begin2;
+            left = left + 2 * L;
+            right = left + L;
+        }
+        for (int i = 1; i < length + 1; i++)
+        {
+            data[i] = T[i];
         }
         L = L * 2;
-        left = 1;
-        right = L + 1;
-        k++;
     }
+    printf("Merging Sort Result: ");
     for (int i = 1; i < length + 1; i++)
     {
-        printf("%d ", D->temp[k].t[i]);
+        printf("%d ", data[i]);
     }
     printf("\n");
+    resetdata(data, data02, length2);
 }
+
 int main()
 {
     InsertSort(data1, length1);
@@ -347,8 +357,6 @@ int main()
     QuickSort(data1, 1, length1, length1);
     SimpleSelectionSort(data1, length1);
     HeapSort(data2, length2);
-    Data *D = (Data *)malloc(sizeof(Data));
-    InitData(D);
-    MergingSort(data1, length1, D);
+    MergingSort(data2, length2);
     return 0;
 }
