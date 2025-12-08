@@ -3,10 +3,13 @@
 
 int data01[] = {0, 49, 38, 65, 97, 76, 13, 27, 49};
 int data02[] = {0, 49, 38, 65, 97, 76, 13, 27, 49, 55, 4};
+int data03[] = {0, 23, 12, 55, 76, 35, 66, 86, 55, 47, 42, 2, 31, 44};
 int data1[] = {0, 49, 38, 65, 97, 76, 13, 27, 49};
 int data2[] = {0, 49, 38, 65, 97, 76, 13, 27, 49, 55, 4};
+int data3[] = {0, 23, 12, 55, 76, 35, 66, 86, 55, 47, 42, 2, 31, 44};
 int length1 = sizeof(data1) / sizeof(data1[0]) - 1;
 int length2 = sizeof(data2) / sizeof(data2[0]) - 1;
+int length3 = sizeof(data3) / sizeof(data3[0]) - 1;
 int visited[sizeof(data2) / sizeof(data2[0])] = {0};
 
 void resetdata(int *data, int *source, int length)
@@ -267,27 +270,6 @@ void HeapSort(int *data, int length)
     resetdata(data, data02, length2);
 }
 
-typedef struct data_i
-{
-    int t[20];
-} data_i;
-
-typedef struct Data
-{
-    data_i temp[20];
-} Data;
-
-void InitData(Data *D)
-{
-    for (int i = 0; i < 20; i++)
-    {
-        for (int j = 0; j < 20; j++)
-        {
-            D->temp[i].t[j] = 0;
-        }
-    }
-}
-
 int check(int *data, int length)
 {
     for (int i = 1; i < length; i++)
@@ -309,13 +291,13 @@ void MergingSort(int *data, int length)
         int left = 1;
         int right = L + left;
         int k = 1;
-        while (left <= length && right <= length)
+        while (left <= length)
         {
             int i = left;
             int j = right;
             while (i <= left - 1 + L && j <= right - 1 + L && i <= length && j <= length)
             {
-                if (data[i] < data[j])
+                if (data[i] <= data[j])
                 {
                     T[k++] = data[i++];
                 }
@@ -337,7 +319,10 @@ void MergingSort(int *data, int length)
         {
             data[i] = T[i];
         }
-        L = L * 2;
+        if (L < length)
+            L = L * 2;
+        else
+            L = length;
     }
     printf("Merging Sort Result: ");
     for (int i = 1; i < length + 1; i++)
@@ -345,7 +330,7 @@ void MergingSort(int *data, int length)
         printf("%d ", data[i]);
     }
     printf("\n");
-    resetdata(data, data02, length2);
+    resetdata(data, data03, length3);
 }
 
 int main()
@@ -357,6 +342,6 @@ int main()
     QuickSort(data1, 1, length1, length1);
     SimpleSelectionSort(data1, length1);
     HeapSort(data2, length2);
-    MergingSort(data2, length2);
+    MergingSort(data3, length3);
     return 0;
 }
