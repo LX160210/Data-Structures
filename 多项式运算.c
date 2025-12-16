@@ -7,7 +7,7 @@ typedef struct LNode
 {
     ElemType coef;
     ElemType exp;
-    ElemType exp2;
+    int visited;
     struct LNode *next;
 } LNode, *LinkList;
 
@@ -55,32 +55,21 @@ LNode *TialInsert(LNode *L, ElemType e, ElemType exp)
     }
     P->coef = e;
     P->exp = exp;
+    P->visited = 0;
     P->next = NULL;
     L->next = P;
     return P;
 }
 
-void print(LNode *L, int n)
+void print(LNode *L)
 {
-    if (n == 0)
+    L = L->next;
+    while (L != NULL)
     {
+        printf("%dx^%d ", L->coef, L->exp);
         L = L->next;
-        while (L != NULL)
-        {
-            printf("%dx^%d ", L->coef, L->exp);
-            L = L->next;
-        }
-        printf("\n");
     }
-    else
-    {
-        while (L->next != NULL)
-        {
-            printf("%dx^%d ", L->coef, L->exp);
-            L = L->next;
-        }
-        printf("\n");
-    }
+    printf("\n");
 }
 
 int Getlength(LNode *L)
@@ -97,24 +86,35 @@ int Getlength(LNode *L)
 
 LNode *Order1(LNode *L)
 {
-    LNode *q = NULL;
-    L = L->next;
-    int Max = -999;
-    int Length = Getlength(L);
-    for (int i = 0; i < Length + 1; i++)
+    LNode *q = (LNode *)malloc(sizeof(LNode));
+    if (q == NULL)
     {
-        if (L->exp > Max && L->exp != -100)
+        fprintf(stderr, "Error: malloc failed in Order1.\n");
+        exit(EXIT_FAILURE);
+    }
+    int Max = -999;
+    L = L->next;
+    LNode *p = L;
+    while (L)
+    {
+        if (L->exp > Max && L->visited != 1)
         {
             Max = L->exp;
-            q = L;
+            q->coef = L->coef;
+            q->exp = L->exp;
         }
         L = L->next;
     }
-    if (q != NULL)
+    while (p)
     {
-        q->exp2 = q->exp;
-        q->exp = -100;
+        if (p->exp == Max)
+        {
+            p->visited = 1;
+            break;
+        }
+        p = p->next;
     }
+    q->next = NULL;
     return q;
 }
 
@@ -122,36 +122,21 @@ LNode *Order2(LNode *L)
 {
     LNode *head = InitList(NULL);
     LNode *p = head;
-    LNode *head0 = head;
     int Length = Getlength(L);
-    for (int i = 0; i < Length + 1; i++)
+    for (int i = 0; i < Length; i++)
     {
-        LNode *q = (LNode *)malloc(sizeof(LNode));
-        if (q == NULL)
-        {
-            fprintf(stderr, "Error: malloc failed in Order2.\n");
-            exit(EXIT_FAILURE);
-        }
+        LNode *q = InitList(NULL);
         LNode *s = Order1(L);
         if (s == NULL)
         {
             free(q);
             break;
         }
-        q->exp = s->exp2;
-        q->exp2 = 0;
+        q->exp = s->exp;
         q->coef = s->coef;
-        q->next = NULL;
         p->next = q;
         p = p->next;
-    }
-    if (Getlength(head0) != Length)
-    {
-        while (head0->next->next != NULL)
-        {
-            head0 = head0->next;
-        }
-        head0->next = NULL;
+        free(s);
     }
     return head;
 }
@@ -160,47 +145,48 @@ LNode *Add(LNode *p1, LNode *p2)
 {
     p1 = p1->next;
     p2 = p2->next;
-    LNode *p = InitList(NULL);
-    LNode *head = p;
+    LNode *head = InitList(NULL);
+    LNode *p = head;
     while (p1 != NULL && p2 != NULL)
     {
+        LNode *temp = InitList(NULL);
         if (p1->exp > p2->exp)
         {
-            p->next = p1;
+            temp->coef = p1->coef;
+            temp->exp = p1->exp;
             p1 = p1->next;
-            p = p->next;
         }
         else if (p1->exp < p2->exp)
         {
-            p->next = p2;
+            temp->coef = p2->coef;
+            temp->exp = p2->exp;
             p2 = p2->next;
-            p = p->next;
         }
         else
         {
-            LNode *temp = InitList(NULL);
-            if (temp == NULL)
-            {
-                fprintf(stderr, "Error: malloc failed in Add.\n");
-                exit(EXIT_FAILURE);
-            }
             temp->coef = p1->coef + p2->coef;
             temp->exp = p1->exp;
-            p->next = temp;
-            p = p->next;
             p1 = p1->next;
             p2 = p2->next;
         }
+        p->next = temp;
+        p = p->next;
     }
     while (p1 != NULL)
     {
-        p->next = p1;
+        LNode *temp = InitList(NULL);
+        temp->coef = p1->coef;
+        temp->exp = p1->exp;
+        p->next = temp;
         p1 = p1->next;
         p = p->next;
     }
     while (p2 != NULL)
     {
-        p->next = p2;
+        LNode *temp = InitList(NULL);
+        temp->coef = p2->coef;
+        temp->exp = p2->exp;
+        p->next = temp;
         p2 = p2->next;
         p = p->next;
     }
@@ -209,13 +195,22 @@ LNode *Add(LNode *p1, LNode *p2)
 
 LNode *Subtract(LNode *p1, LNode *p2)
 {
-    LNode *p0 = p2->next;
-    while (p0 != NULL)
+    LNode *p0 = InitList(NULL);
+    LNode *head0 = InitList(NULL);
+    p0->next = head0;
+    p2 = p2->next;
+    LNode *p;
+    while (p2 != NULL)
     {
-        p0->coef = -p0->coef;
-        p0 = p0->next;
+        head0->coef = -p2->coef;
+        head0->exp = p2->exp;
+        head0->next = InitList(NULL);
+        p = head0;
+        head0 = head0->next;
+        p2 = p2->next;
     }
-    return Add(p1, p2);
+    p->next = NULL;
+    return Add(p1, p0);
 }
 
 int checkexp(int exp[], int n, int length)
@@ -235,8 +230,10 @@ int cmp(const void *a, const void *b)
 
 LNode *Multiply(LNode *p1, LNode *p2)
 {
-    int exp[100];
-    int coef[100] = {0};
+    int exp[Getlength(p1) * Getlength(p2)];
+    int coef[Getlength(p1) * Getlength(p2)];
+    for (int i = 0; i < Getlength(p1) * Getlength(p2); i++)
+        coef[i] = 0;
     int length = 0;
     LNode *begin;
     p1 = p1->next;
@@ -255,6 +252,7 @@ LNode *Multiply(LNode *p1, LNode *p2)
             }
             current->coef = p1->coef * p2->coef;
             current->exp = p1->exp + p2->exp;
+            current->next = NULL;
             p->next = current;
             p = p->next;
             p2 = p2->next;
@@ -262,7 +260,7 @@ LNode *Multiply(LNode *p1, LNode *p2)
         p1 = p1->next;
         p2 = begin;
     }
-    LNode *un1 = head;
+    LNode *un1 = head->next;
     int k = 0;
     while (un1 != NULL)
     {
@@ -274,7 +272,7 @@ LNode *Multiply(LNode *p1, LNode *p2)
         un1 = un1->next;
     }
     qsort(exp, length, sizeof(int), cmp);
-    LNode *un2 = head;
+    LNode *un2 = head->next;
     while (un2 != NULL)
     {
         for (int i = 0; i < length; i++)
@@ -284,26 +282,20 @@ LNode *Multiply(LNode *p1, LNode *p2)
         }
         un2 = un2->next;
     }
-    LNode *result = (LNode *)malloc(sizeof(LNode));
-    if (result == NULL)
-    {
-        fprintf(stderr, "Error: malloc failed in Multiply (result head).\n");
-        exit(EXIT_FAILURE);
-    }
-    LNode *tail = result;
+    FreeList(head);
+    LNode *result = InitList(NULL);
+    LNode *tail = InitList(NULL);
+    result->next = tail;
+    LNode *P;
     for (int i = 0; i < length; i++)
     {
         tail->coef = coef[i];
         tail->exp = exp[i];
-        tail->next = (LNode *)malloc(sizeof(LNode));
-        if (tail->next == NULL && i != length - 1)
-        {
-            fprintf(stderr, "Error: malloc failed in Multiply (result node).\n");
-            exit(EXIT_FAILURE);
-        }
+        tail->next = InitList(NULL);
+        P = tail;
         tail = tail->next;
     }
-    tail->next = NULL;
+    P->next = NULL;
     return result;
 }
 
@@ -317,7 +309,7 @@ int main()
     tial = TialInsert(tial, 6, 1);
     tial = TialInsert(tial, 8, 0);
     tial = TialInsert(tial, 7, -1);
-    print(head1, 0);
+    print(head1);
     LNode *head2 = InitList(NULL);
     tial = head2;
     tial = TialInsert(tial, 4, 5);
@@ -325,10 +317,10 @@ int main()
     tial = TialInsert(tial, 1, 3);
     tial = TialInsert(tial, 3, 1);
     tial = TialInsert(tial, 4, -1);
-    print(head2, 0);
+    print(head2);
     LNode *head3 = Add(head1, head2);
     printf("Addition Result:\n");
-    print(head3, 0);
+    print(head3);
 
     printf("Example2:\n");
     LNode *head4 = InitList(NULL);
@@ -339,7 +331,7 @@ int main()
     tial = TialInsert(tial, 8, 3);
     tial = TialInsert(tial, 7, 0);
     head4 = Order2(head4);
-    print(head4, 0);
+    print(head4);
     LNode *head5 = InitList(NULL);
     tial = head5;
     tial = TialInsert(tial, 4, 4);
@@ -349,10 +341,10 @@ int main()
     tial = TialInsert(tial, 4, 0);
     tial = TialInsert(tial, 7, 2);
     head5 = Order2(head5);
-    print(head5, 0);
+    print(head5);
     printf("Subtraction Result:\n");
     LNode *head6 = Subtract(head4, head5);
-    print(head6, 0);
+    print(head6);
 
     printf("Example3:\n");
     LNode *head7 = InitList(NULL);
@@ -360,15 +352,17 @@ int main()
     tial = TialInsert(tial, 1, 1);
     tial = TialInsert(tial, 2, 0);
     tial = TialInsert(tial, 3, 2);
-    print(head7, 0);
+    tial = TialInsert(tial, 4, 3);
+    print(head7);
     LNode *head8 = InitList(NULL);
     tial = head8;
     tial = TialInsert(tial, 4, 1);
     tial = TialInsert(tial, 5, 0);
-    print(head8, 0);
+    tial = TialInsert(tial, 6, 2);
+    print(head8);
     printf("Multiplication Result:\n");
     LNode *head9 = Multiply(head7, head8);
-    print(head9, 1);
+    print(head9);
 
     FreeList(head1);
     FreeList(head2);
