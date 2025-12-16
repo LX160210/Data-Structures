@@ -1,19 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 typedef int ElemType;
+
 typedef struct LNode
 {
-    ElemType data;
-    ElemType info;
-    ElemType info2;
+    ElemType coef;
+    ElemType exp;
+    ElemType exp2;
     struct LNode *next;
 } LNode, *LinkList;
+
+void FreeList(LNode *L)
+{
+    LNode *p;
+    while (L)
+    {
+        p = L;
+        L = L->next;
+        free(p);
+    }
+}
 
 LNode *InitList(LNode *L)
 {
     L = (LNode *)malloc(sizeof(LNode));
-    L->data = 0;
-    L->info = 0;
+    if (L == NULL)
+    {
+        fprintf(stderr, "Error: malloc failed in InitList.\n");
+        exit(EXIT_FAILURE);
+    }
+    L->coef = 0;
+    L->exp = 0;
     L->next = NULL;
     return L;
 }
@@ -27,11 +45,16 @@ LNode *GetTial(LNode *L)
     return L;
 }
 
-LNode *TialInsert(LNode *L, ElemType e, ElemType info)
+LNode *TialInsert(LNode *L, ElemType e, ElemType exp)
 {
     LNode *P = (LNode *)malloc(sizeof(LNode));
-    P->data = e;
-    P->info = info;
+    if (P == NULL)
+    {
+        fprintf(stderr, "Error: malloc failed in TialInsert.\n");
+        exit(EXIT_FAILURE);
+    }
+    P->coef = e;
+    P->exp = exp;
     P->next = NULL;
     L->next = P;
     return P;
@@ -44,7 +67,7 @@ void print(LNode *L, int n)
         L = L->next;
         while (L != NULL)
         {
-            printf("%dx^%d ", L->data, L->info);
+            printf("%dx^%d ", L->coef, L->exp);
             L = L->next;
         }
         printf("\n");
@@ -53,7 +76,7 @@ void print(LNode *L, int n)
     {
         while (L->next != NULL)
         {
-            printf("%dx^%d ", L->data, L->info);
+            printf("%dx^%d ", L->coef, L->exp);
             L = L->next;
         }
         printf("\n");
@@ -80,17 +103,17 @@ LNode *Order1(LNode *L)
     int Length = Getlength(L);
     for (int i = 0; i < Length + 1; i++)
     {
-        if (L->info > Max && L->info != -100)
+        if (L->exp > Max && L->exp != -100)
         {
-            Max = L->info;
+            Max = L->exp;
             q = L;
         }
         L = L->next;
     }
     if (q != NULL)
     {
-        q->info2 = q->info;
-        q->info = -100;
+        q->exp2 = q->exp;
+        q->exp = -100;
     }
     return q;
 }
@@ -104,15 +127,20 @@ LNode *Order2(LNode *L)
     for (int i = 0; i < Length + 1; i++)
     {
         LNode *q = (LNode *)malloc(sizeof(LNode));
+        if (q == NULL)
+        {
+            fprintf(stderr, "Error: malloc failed in Order2.\n");
+            exit(EXIT_FAILURE);
+        }
         LNode *s = Order1(L);
         if (s == NULL)
         {
             free(q);
             break;
         }
-        q->info = s->info2;
-        q->info2 = 0;
-        q->data = s->data;
+        q->exp = s->exp2;
+        q->exp2 = 0;
+        q->coef = s->coef;
         q->next = NULL;
         p->next = q;
         p = p->next;
@@ -136,13 +164,13 @@ LNode *Add(LNode *p1, LNode *p2)
     LNode *head = p;
     while (p1 != NULL && p2 != NULL)
     {
-        if (p1->info > p2->info)
+        if (p1->exp > p2->exp)
         {
             p->next = p1;
             p1 = p1->next;
             p = p->next;
         }
-        else if (p1->info < p2->info)
+        else if (p1->exp < p2->exp)
         {
             p->next = p2;
             p2 = p2->next;
@@ -151,8 +179,13 @@ LNode *Add(LNode *p1, LNode *p2)
         else
         {
             LNode *temp = InitList(NULL);
-            temp->data = p1->data + p2->data;
-            temp->info = p1->info;
+            if (temp == NULL)
+            {
+                fprintf(stderr, "Error: malloc failed in Add.\n");
+                exit(EXIT_FAILURE);
+            }
+            temp->coef = p1->coef + p2->coef;
+            temp->exp = p1->exp;
             p->next = temp;
             p = p->next;
             p1 = p1->next;
@@ -179,21 +212,17 @@ LNode *Subtract(LNode *p1, LNode *p2)
     LNode *p0 = p2->next;
     while (p0 != NULL)
     {
-        p0->data = -p0->data;
+        p0->coef = -p0->coef;
         p0 = p0->next;
     }
     return Add(p1, p2);
 }
 
-int info[100];
-int data[100] = {0};
-int length = 0;
-
-int checkinfo(int info[], int n)
+int checkexp(int exp[], int n, int length)
 {
     for (int i = 0; i < length; i++)
     {
-        if (info[i] == n)
+        if (exp[i] == n)
             return 0;
     }
     return 1;
@@ -206,6 +235,9 @@ int cmp(const void *a, const void *b)
 
 LNode *Multiply(LNode *p1, LNode *p2)
 {
+    int exp[100];
+    int coef[100] = {0};
+    int length = 0;
     LNode *begin;
     p1 = p1->next;
     begin = p2 = p2->next;
@@ -216,8 +248,13 @@ LNode *Multiply(LNode *p1, LNode *p2)
         while (p2 != NULL)
         {
             LNode *current = (LNode *)malloc(sizeof(LNode));
-            current->data = p1->data * p2->data;
-            current->info = p1->info + p2->info;
+            if (current == NULL)
+            {
+                fprintf(stderr, "Error: malloc failed in Multiply.\n");
+                exit(EXIT_FAILURE);
+            }
+            current->coef = p1->coef * p2->coef;
+            current->exp = p1->exp + p2->exp;
             p->next = current;
             p = p->next;
             p2 = p2->next;
@@ -229,31 +266,42 @@ LNode *Multiply(LNode *p1, LNode *p2)
     int k = 0;
     while (un1 != NULL)
     {
-        if (checkinfo(info, un1->info))
+        if (checkexp(exp, un1->exp, length))
         {
-            info[k++] = un1->info;
+            exp[k++] = un1->exp;
             length++;
         }
         un1 = un1->next;
     }
-    qsort(info, length, sizeof(int), cmp);
+    qsort(exp, length, sizeof(int), cmp);
     LNode *un2 = head;
     while (un2 != NULL)
     {
         for (int i = 0; i < length; i++)
         {
-            if (un2->info == info[i])
-                data[i] += un2->data;
+            if (un2->exp == exp[i])
+                coef[i] += un2->coef;
         }
         un2 = un2->next;
     }
     LNode *result = (LNode *)malloc(sizeof(LNode));
+    if (result == NULL)
+    {
+        fprintf(stderr, "Error: malloc failed in Multiply (result head).\n");
+        exit(EXIT_FAILURE);
+    }
     LNode *tail = result;
     for (int i = 0; i < length; i++)
     {
-        tail->data = data[i];
-        tail->info = info[i];
-        tail = tail->next = (LNode *)malloc(sizeof(LNode));
+        tail->coef = coef[i];
+        tail->exp = exp[i];
+        tail->next = (LNode *)malloc(sizeof(LNode));
+        if (tail->next == NULL && i != length - 1)
+        {
+            fprintf(stderr, "Error: malloc failed in Multiply (result node).\n");
+            exit(EXIT_FAILURE);
+        }
+        tail = tail->next;
     }
     tail->next = NULL;
     return result;
@@ -322,5 +370,14 @@ int main()
     LNode *head9 = Multiply(head7, head8);
     print(head9, 1);
 
+    FreeList(head1);
+    FreeList(head2);
+    FreeList(head3);
+    FreeList(head4);
+    FreeList(head5);
+    FreeList(head6);
+    FreeList(head7);
+    FreeList(head8);
+    FreeList(head9);
     return 0;
 }
