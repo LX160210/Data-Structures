@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef int ElemType;
-
 typedef struct LNode
 {
-    ElemType coef;
-    ElemType exp;
+    int coef;
+    int exp;
     int visited;
     struct LNode *next;
 } LNode, *LinkList;
@@ -36,7 +34,7 @@ LNode *InitList(LNode *L)
     return L;
 }
 
-LNode *GetTial(LNode *L)
+LNode *GetTail(LNode *L)
 {
     while (L->next != NULL)
     {
@@ -45,15 +43,15 @@ LNode *GetTial(LNode *L)
     return L;
 }
 
-LNode *TialInsert(LNode *L, ElemType e, ElemType exp)
+LNode *TailInsert(LNode *L, int coef, int exp)
 {
     LNode *P = (LNode *)malloc(sizeof(LNode));
     if (P == NULL)
     {
-        fprintf(stderr, "Error: malloc failed in TialInsert.\n");
+        fprintf(stderr, "Error: malloc failed in TailInsert.\n");
         exit(EXIT_FAILURE);
     }
-    P->coef = e;
+    P->coef = coef;
     P->exp = exp;
     P->visited = 0;
     P->next = NULL;
@@ -84,12 +82,12 @@ int Getlength(LNode *L)
     return length;
 }
 
-LNode *Order1(LNode *L)
+LNode *Select(LNode *L)
 {
     LNode *q = (LNode *)malloc(sizeof(LNode));
     if (q == NULL)
     {
-        fprintf(stderr, "Error: malloc failed in Order1.\n");
+        fprintf(stderr, "Error: malloc failed in Select.\n");
         exit(EXIT_FAILURE);
     }
     int Max = -999;
@@ -118,7 +116,7 @@ LNode *Order1(LNode *L)
     return q;
 }
 
-LNode *Order2(LNode *L)
+LNode *Sort(LNode *L)
 {
     LNode *head = InitList(NULL);
     LNode *p = head;
@@ -126,7 +124,7 @@ LNode *Order2(LNode *L)
     for (int i = 0; i < Length; i++)
     {
         LNode *q = InitList(NULL);
-        LNode *s = Order1(L);
+        LNode *s = Select(L);
         if (s == NULL)
         {
             free(q);
@@ -229,10 +227,11 @@ int cmp(const void *a, const void *b)
 }
 
 LNode *Multiply(LNode *p1, LNode *p2)
-{
-    int exp[Getlength(p1) * Getlength(p2)];
-    int coef[Getlength(p1) * Getlength(p2)];
-    for (int i = 0; i < Getlength(p1) * Getlength(p2); i++)
+{   
+    int Length= Getlength(p1) * Getlength(p2);
+    int exp[Length];
+    int coef[Length];
+    for (int i = 0; i < Length; i++)
         coef[i] = 0;
     int length = 0;
     LNode *begin;
@@ -302,76 +301,76 @@ LNode *Multiply(LNode *p1, LNode *p2)
 int main()
 {
     printf("Example1:\n");
-    LNode *head1 = InitList(NULL);
-    LNode *tial = head1;
-    tial = TialInsert(tial, 3, 4);
-    tial = TialInsert(tial, 5, 2);
-    tial = TialInsert(tial, 6, 1);
-    tial = TialInsert(tial, 8, 0);
-    tial = TialInsert(tial, 7, -1);
-    print(head1);
-    LNode *head2 = InitList(NULL);
-    tial = head2;
-    tial = TialInsert(tial, 4, 5);
-    tial = TialInsert(tial, 2, 4);
-    tial = TialInsert(tial, 1, 3);
-    tial = TialInsert(tial, 3, 1);
-    tial = TialInsert(tial, 4, -1);
-    print(head2);
-    LNode *head3 = Add(head1, head2);
+    LNode *poly1 = InitList(NULL);
+    LNode *tail = poly1;
+    tail = TailInsert(tail, 3, 4);
+    tail = TailInsert(tail, 5, 2);
+    tail = TailInsert(tail, 6, 1);
+    tail = TailInsert(tail, 8, 0);
+    tail = TailInsert(tail, 7, -1);
+    print(poly1);
+    LNode *poly2 = InitList(NULL);
+    tail = poly2;
+    tail = TailInsert(tail, 4, 5);
+    tail = TailInsert(tail, 2, 4);
+    tail = TailInsert(tail, 1, 3);
+    tail = TailInsert(tail, 3, 1);
+    tail = TailInsert(tail, 4, -1);
+    print(poly2);
+    LNode *sum = Add(poly1, poly2);
     printf("Addition Result:\n");
-    print(head3);
+    print(sum);
 
     printf("Example2:\n");
-    LNode *head4 = InitList(NULL);
-    tial = head4;
-    tial = TialInsert(tial, 3, 2);
-    tial = TialInsert(tial, 5, 4);
-    tial = TialInsert(tial, 6, 1);
-    tial = TialInsert(tial, 8, 3);
-    tial = TialInsert(tial, 7, 0);
-    head4 = Order2(head4);
-    print(head4);
-    LNode *head5 = InitList(NULL);
-    tial = head5;
-    tial = TialInsert(tial, 4, 4);
-    tial = TialInsert(tial, 2, 5);
-    tial = TialInsert(tial, 1, 3);
-    tial = TialInsert(tial, 3, 1);
-    tial = TialInsert(tial, 4, 0);
-    tial = TialInsert(tial, 7, 2);
-    head5 = Order2(head5);
-    print(head5);
+    LNode *poly4 = InitList(NULL);
+    tail = poly4;
+    tail = TailInsert(tail, 3, 2);
+    tail = TailInsert(tail, 5, 4);
+    tail = TailInsert(tail, 6, 1);
+    tail = TailInsert(tail, 8, 3);
+    tail = TailInsert(tail, 7, 0);
+    poly4 = Sort(poly4);
+    print(poly4);
+    LNode *poly5 = InitList(NULL);
+    tail = poly5;
+    tail = TailInsert(tail, 4, 4);
+    tail = TailInsert(tail, 2, 5);
+    tail = TailInsert(tail, 1, 3);
+    tail = TailInsert(tail, 3, 1);
+    tail = TailInsert(tail, 4, 0);
+    tail = TailInsert(tail, 7, 2);
+    poly5 = Sort(poly5);
+    print(poly5);
     printf("Subtraction Result:\n");
-    LNode *head6 = Subtract(head4, head5);
-    print(head6);
+    LNode *diff = Subtract(poly4, poly5);
+    print(diff);
 
     printf("Example3:\n");
-    LNode *head7 = InitList(NULL);
-    tial = head7;
-    tial = TialInsert(tial, 1, 1);
-    tial = TialInsert(tial, 2, 0);
-    tial = TialInsert(tial, 3, 2);
-    tial = TialInsert(tial, 4, 3);
-    print(head7);
-    LNode *head8 = InitList(NULL);
-    tial = head8;
-    tial = TialInsert(tial, 4, 1);
-    tial = TialInsert(tial, 5, 0);
-    tial = TialInsert(tial, 6, 2);
-    print(head8);
+    LNode *poly7 = InitList(NULL);
+    tail = poly7;
+    tail = TailInsert(tail, 1, 1);
+    tail = TailInsert(tail, 2, 0);
+    tail = TailInsert(tail, 3, 2);
+    tail = TailInsert(tail, 4, 3);
+    print(poly7);
+    LNode *poly8 = InitList(NULL);
+    tail = poly8;
+    tail = TailInsert(tail, 4, 1);
+    tail = TailInsert(tail, 5, 0);
+    tail = TailInsert(tail, 6, 2);
+    print(poly8);
     printf("Multiplication Result:\n");
-    LNode *head9 = Multiply(head7, head8);
-    print(head9);
+    LNode *product = Multiply(poly7, poly8);
+    print(product);
 
-    FreeList(head1);
-    FreeList(head2);
-    FreeList(head3);
-    FreeList(head4);
-    FreeList(head5);
-    FreeList(head6);
-    FreeList(head7);
-    FreeList(head8);
-    FreeList(head9);
+    FreeList(poly1);
+    FreeList(poly2);
+    FreeList(sum);
+    FreeList(poly4);
+    FreeList(poly5);
+    FreeList(diff);
+    FreeList(poly7);
+    FreeList(poly8);
+    FreeList(product);
     return 0;
 }
