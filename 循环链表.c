@@ -44,8 +44,7 @@ int DeleteByValue(LNode *L, int x)
         printf("链表为空，无法删除\n");
         return -1;
     }
-    LNode *q = L;
-    //q = q->next;
+    LNode *q = L;//需遍历头节点，绝不能跳过
     while (q->next->data != x)
     {
         q = q->next;
@@ -71,6 +70,7 @@ void PrintList(LNode *L)
         p = p->next;
     }
 }
+
 int main()
 {
     LNode *L = InitLNode();
