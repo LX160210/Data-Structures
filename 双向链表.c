@@ -9,19 +9,21 @@ typedef struct DNode
 } DNode;
 
 // 初始化双向链表头结点
-void InitList(DNode *D)
+DNode* InitList()
 {
-    D->data = 0;
+    DNode *D = (DNode *)malloc(sizeof(DNode));
     D->prior = NULL;
     D->next = NULL;
+    return D;
 }
+
 // 在 p 后插入新节点，值为 x
 int InsertNext(DNode *p, int x)
 {
     if (p->next)
     {
         DNode *q = p->next;
-        DNode *P = (DNode *)malloc(sizeof(DNode));
+        DNode *P = InitList();
         P->data = x;
         p->next = P;
         P->prior = p;
@@ -30,31 +32,33 @@ int InsertNext(DNode *p, int x)
     }
     else
     {
-        DNode *P = (DNode *)malloc(sizeof(DNode));
+        DNode *P = InitList();
         P->data = x;
         p->next = P;
         P->prior = p;
         P->next = NULL;
     }
     return 0;
-} // 在 p 后插入
+}
 
 // 在 p 前插入新节点，值为 x
 int InsertPrior(DNode *p, int x)
 {
-        DNode *q = p->prior;
-        DNode *P = (DNode *)malloc(sizeof(DNode));
-        P->data = x;
-        p->prior = P;
-        P->next = p;
-        P->prior = q;
-        q->next = P;
+    DNode *q = p->prior;
+    DNode *P = InitList();
+    P->data = x;
+    p->prior = P;
+    P->next = p;
+    P->prior = q;
+    q->next = P;
     return 0;
-} // 在 p 前插入
+}
 
 // 删除 p 本身
 int DeleteNode(DNode *p)
-{
+{   
+    if (p == NULL || p->prior == NULL)
+        return -1;
     if (p->next)
     {
         p->prior->next = p->next;
@@ -67,7 +71,7 @@ int DeleteNode(DNode *p)
         free(p);
     }
     return 0;
-} // 删除 p 本身
+}
 
 // 正向输出链表
 void PrintList(DNode *D)
@@ -79,7 +83,7 @@ void PrintList(DNode *D)
         D = D->next;
     }
     printf("\n");
-} // 正向输出
+}
 
 // 定位到尾节点
 DNode *gettail(DNode *D)
@@ -105,8 +109,7 @@ void PrintListReverse(DNode *D)
 
 int main()
 {
-    DNode *D = (DNode *)malloc(sizeof(DNode));
-    InitList(D);
+    DNode *D = InitList();
     InsertNext(D, 1);
     InsertNext(D->next, 2);
     InsertNext(D->next->next, 3);
