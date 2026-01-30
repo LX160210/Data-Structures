@@ -29,10 +29,10 @@ int InsertTail(Node *L, int x)
     return 1;
 }
 
-Node *CreateJosephus(int k)
+Node *CreateJosephus(int n)
 {
     Node *L = InitList();
-    for (int i = 2; i < k + 1; i++)
+    for (int i = 2; i < n + 1; i++)
     {
         InsertTail(L, i);
     }
@@ -42,21 +42,31 @@ Node *CreateJosephus(int k)
 int Josephus(int n, int k)
 {
     Node *p = CreateJosephus(n);
-    int step = k - 2;
-    while (p->next != p)
+    if (k == 1)
     {
-        for (int i = 1; i < step + 1; i++)
+        return n;
+    }
+    else
+    {
+        int step = k - 2;
+        while (p->next != p)
         {
+            for (int i = 1; i < step + 1; i++)
+            {
+                p = p->next;
+            }
+            Node *toDelete = p->next;
+            p->next = toDelete->next;
+            free(toDelete);
             p = p->next;
         }
-        p->next = p->next->next;
-        p = p->next;
+        return p->id;
     }
-    return p->id;
 }
 
 int main()
 {
+    printf("%d ", Josephus(5, 1));
     printf("%d ", Josephus(7, 3));
     printf("%d ", Josephus(10, 4));
     return 0;
