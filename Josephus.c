@@ -29,10 +29,36 @@ int InsertTail(Node *L, int x)
     return 1;
 }
 
+void ReverseList(Node *L)
+{
+    Node *prev = L;
+    Node *curr = L->next;
+    Node *next;
+    while (curr != L)
+    {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    curr->next = prev;
+}
+
 Node *CreateJosephus(int n)
 {
     Node *L = InitList();
     for (int i = 2; i < n + 1; i++)
+    {
+        InsertTail(L, i);
+    }
+    return L;
+}
+
+Node *CreateList(int n)
+{
+    Node *L = (Node *)malloc(sizeof(Node));
+    L->next = L;
+    for (int i = 1; i < n + 1; i++)
     {
         InsertTail(L, i);
     }
@@ -60,14 +86,30 @@ int Josephus(int n, int k)
             free(toDelete);
             p = p->next;
         }
-        return p->id;
+        int result = p->id;
+        free(p);
+        return result;
     }
+}
+
+void PrintList(Node *L)
+{
+    Node *p = L->next;
+    while (p != L)
+    {
+        printf("%d ", p->id);
+        p = p->next;
+    }
+    return;
 }
 
 int main()
 {
     printf("%d ", Josephus(5, 1));
     printf("%d ", Josephus(7, 3));
-    printf("%d ", Josephus(10, 4));
+    printf("%d \n", Josephus(10, 4));
+    Node *L = CreateList(5);
+    ReverseList(L);
+    PrintList(L);
     return 0;
 }
